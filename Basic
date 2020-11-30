@@ -51,7 +51,7 @@ ansible contrail -b --become-user=heat-admin -m shell -a 'sudo contrail-status' 
   become : true
   tasks :
         - name : Get IP addresses from NFVI
-          shell : "ip -o a"
+          shell : "ip -o a && ip addr && hostname"
           register : ip_output
         - debug : var=ip_output
 
