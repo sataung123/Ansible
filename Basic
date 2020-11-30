@@ -410,5 +410,10 @@ pkgname: mysql-server
 You don’t need to declare the variable in your playbook, 
 as Ansible will automatically pull the variables from each group_vars files and will substitute them during runtime.
 
+### retry ansible ###
+For stopping ansible to create .retry files is by disabling .retry files in ansible.cfg
+retry_files_enabled = False # Do not create them
 
+Or you can also change the path using
+retry_files_save_path = "~/" # The directory they will go into
 
