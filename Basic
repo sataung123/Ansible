@@ -482,5 +482,12 @@ vars_prompt:
     state: present
     gid: 1750
     
- 
+### add or remove ssh key ###
+- name: Set up multiple authorized keys
+  authorized_key:
+    user: deploy
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - ~/.ssh/id_rsa.pub
 
