@@ -306,6 +306,25 @@ Start, stop or restart a service on a remote host
     enabled: true
   become: true
 
+### notify handler ###
+A handler is the same as a task, but it will be executed when called by another task. 
+It is like an event-driven system. A handler will run a task only when it is called by an event it listens for.
 
+---
+- hosts: webservers
+  gather_facts: yes
+  become_user: root
+  tasks:
+  - name: Install Nginx
+    apt: pkg=nginx state=present
+    notify:
+    - restart nginx
+  - name: Enable Nginx during boot
+    service: name=nginx state=started enabled=yes
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+      
+The handlers section restarts Nginx when Ansible gets notified that Nginx has been installed.
 
 
