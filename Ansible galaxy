@@ -6,3 +6,9 @@
 
 [root@ansible ~]# ansible-galaxy install bennojoy.ntp
 
+[root@chnfcrrd901 ~]# ansible-galaxy list
+
+[root@chnfcrrd901 bennojoy.ntp]# ansible-galaxy role list
+
+[root@chnfcrrd901 bennojoy.ntp]# ansible-galaxy role info bennojoy.ntp
+
