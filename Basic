@@ -470,3 +470,17 @@ vars_prompt:
     confirm: yes
     salt_size: 7
 
+### Ensure group exist ###
+- name: Ensure group "somegroup" exists
+  group:
+    name: somegroup
+    state: present
+
+- name: Ensure group "docker" exists with correct gid
+  group:
+    name: docker
+    state: present
+    gid: 1750
+    
+ 
+
