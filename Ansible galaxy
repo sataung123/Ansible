@@ -1,0 +1,8 @@
+[root@ansible ~]# ansible-galaxy --help
+
+[root@ansible ~]# ansible-galaxy search ntp
+
+[root@ansible ~]# ansible-galaxy info bennojoy.ntp
+
+[root@ansible ~]# ansible-galaxy install bennojoy.ntp
+
