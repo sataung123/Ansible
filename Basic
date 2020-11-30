@@ -250,5 +250,62 @@ Use the register keyword to capture the output of the yum module.
 
 - debug: var=yum_output
 
+## copy module ##
+Copying files from the local host to the remote host
+
+- name: copy file from local host to remote host (relative path, ./files/)
+  copy:
+    src: test_file
+    dest: $HOME/test_file
+    
+Copying files between locations on the remote host (using the remote_src parameter)
+
+- name: copy file between locations on the remote host
+  copy:
+    src: $HOME/test_file
+    remote_src: true
+    dest: $HOME/test_file2
+    
+## fetch module ##
+Ansible’s fetch module transfers files from a remote host to the local host. 
+This is the reverse of the copy module.
+
+- name: fetch nginx access log
+  fetch:
+    src: /var/log/nginx/access.log
+    dest: fetched
+    
+fetch a directory recursively is NG now
+
+### service module ###
+Ansible’s service module controls services on remote hosts and is useful for these common tasks:
+Start, stop or restart a service on a remote host
+
+- name: ensure nginx service is started
+  service:
+    name: nginx
+    state: started
+  become: true
+  
+- name: ensure nginx service is stopped
+  service:
+    name: nginx
+    state: stopped
+  become: true
+  
+- name: restart the nginx service
+  service:
+    name: nginx
+    state: restarted
+  become: true
+  
+- name: ensure nginx service is started and also starts on boot
+  service:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
+
+
 
 
