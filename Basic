@@ -1,0 +1,153 @@
+ ## see ansible hosts ##
+ansible all --list-hosts
+vim /etc/ansible/hosts
+ cat /etc/ansible/hosts
+ [contrail]
+ 10.50.0.47
+ 10.50.0.37
+ 10.50.0.36
+
+ [compute]
+ 10.50.0.38
+ 10.50.0.43
+ 10.50.0.48
+ 10.50.0.40
+
+ [openstack]
+ 10.50.0.58
+ 10.50.0.57
+ 10.50.0.33
+
+ [hosts]
+ 10.50.0.10
+ 10.50.0.11
+ 10.50.0.12
+ 10.50.0.13
+ 
+ ## check ansible version ##
+ansible --version
+
+## ping ansible ##
+ansible all -m ping -u heat-admin
+
+## ping with group ##
+ansible contrail -m ping -u heat-admin
+
+## list of modules ##
+ansible-doc -l
+
+## shell module ##
+ansible contrail -b --become-user=heat-admin -m shell -a 'sudo contrail-status' -u heat-admin
+-b: Instruct ansible to become another user to run the command
+--become-user=root: Run the command as a root user
+-m: Declares which module is used in the command
+-a: Declares which arguments are passed to the module
+
+## with_items module ##
+Sometimes we want to do many things with single tasks like installing many packages with the same tasks just by changing the arguments.
+By using the with_items, ansible creates a temporary variable called {{item}} which consist the value for the current iteration. 
+Let’s have some example to understand this.
+
+# Installing Packages with one Task ( Faster Process )
+- name: Installing Packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - git
+    - nginx
+    - memcached
+    
+## Facts gathering module ##
+Facts are nothing but information that we derive from speaking with the remote system. 
+Ansible uses setup module to discover this information automatically.
+It becomes a time consuming process in Ansible as it has to gather information from all the hosts listed in your inventory file. 
+We can avoid this situation and speed up our play execution by specifying gathering_facts to false in playbook.
+
+- hosts: web
+  gather_facts: False
+  
+rather than asking for all facts, we can minimize this by only asking network or hardware facts to save some time. 
+To do this, you have to keep gather_facts to True and also pass one more attribute named gather_subset to fetch specific remote information.
+
+- hosts: web
+  gather_facts: True
+  gather_subset: network,virtual
+  
+## any_errors_fatal module ##
+if any failure occurred on any server should fail the entire play because we don’t want the deployments to be partial on any server.
+
+- hosts: web
+  any_errors_fatal: true
+
+The any_error_fatal option will mark all the hosts as failed if fails and immediately abort the playbook execution.
+
+## max_fail_percentage ##
+allows you to abort the play if certain threshold of failures have been reached.
+
+- hosts: web
+  max_fail_percentage: 30
+  serial: 30
+  
+If 30 of the servers to fail out of 100. Ansible will abort the rest of the play.
+
+## debug module ##
+The msg argument prints the information. Now if you run the playbook, you see the debug message:
+
+---
+- name: Debug Example - Hello World
+hosts: localhost
+tasks:
+- name: Print debug message
+debug:
+
+## register module ##
+In Ansible, you can run any shell command on your Ansible hosts, the hosts you will be configuring with Ansible.
+These shell commands may have outputs.
+By default, the output is ignored. 
+If you want to store the output in a variable and use it later, then you can use the Ansible register module. 
+
+- hosts: ubuntu20
+  user: ansible
+  become: True
+  tasks:
+    - name: Ensure pwgen is installed
+      apt:
+         name: pwgen
+         state: present
+         update_cache: True
+    - name: Generate password
+      shell: pwgen -N 1 -s 30
+      register: mypass
+    - name: Print the generated password
+      debug:
+      msg: "The password is {{ mypass }}"
+      
+## cli_command module ##
+The cli_command allows you to run arbitrary commands on network devices.
+---
+- name: RUN COMMAND AND PRINT TO TERMINAL WINDOW
+  hosts: arista
+  gather_facts: false
+
+  tasks:
+
+    - name: RUN ARISTA COMMAND
+      cli_command:
+        command: show ip interface brief
+      register: command_output
+
+    - name: PRINT TO TERMINAL WINDOW
+      debug:
+        msg: "{{command_output.stdout}}"
+        
+## network_cli plugin ##
+This connection plugin provides a connection to remote devices over the SSH and implements a CLI shell. 
+This connection plugin is typically used by network devices for sending and receiving CLi commands to network devices.
+
+---
+- hosts: cisco
+ gather_facts: false
+ connection: network_cli
+
+
