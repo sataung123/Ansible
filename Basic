@@ -491,3 +491,18 @@ vars_prompt:
   with_file:
     - ~/.ssh/id_rsa.pub
 
+## lineinfile ##
+This module will search a file for a line, and ensure that it is present or absent.
+This is primarily useful when you want to change a single line in a file only. 
+
+    - name: Restrict root SSH logins
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#PermitRootLogin'
+        line: 'PermitRootLogin no'
+        
+
+
+
+
