@@ -327,4 +327,76 @@ It is like an event-driven system. A handler will run a task only when it is cal
       
 The handlers section restarts Nginx when Ansible gets notified that Nginx has been installed.
 
+### variables ###
+variables are similar to variables in any programming language—they let you input values and numbers dynamically into your playbook.
+There are few places where you can define variables in an Ansible playbook.
+In the playbook
+In the inventory file
+In a separate variable file
+Using group_vars
+
+To define variables in a playbook, use vars key just above the task where you want to use the variable. 
+Once declared, you can use it inside the {{ }} tag.
+
+---
+- hosts: webservers
+  gather_facts: yes
+  become_user: root
+
+  vars:
+    pkgname: nginx
+
+  tasks:
+  - name: Install "{{ pkgname }}"
+    apt: pkg="{{ pkgname }}" state=present
+
+It is also possible to declare a variable in the inventory file using the syntax [host_group_name:vars]. 
+
+[webservers:vars]
+pkgname=nginx
+
+Now the variable pkgname can be used anywhere in the webservers hosts section in the playbook.
+
+You can also define variables in a separate variable file and import it into the playbook.
+
+$ vi ansible_vars.yml
+
+---
+pkgname: nginx
+
+To use the variable pkgname, import the above file using the vars_files keyword in the playbook.
+
+$ vi playbook.yml
+
+---
+- hosts: webservers
+  gather_facts: yes
+  become_user: root
+ 
+  vars_files:
+    - ./ansible_vars.yml
+    
+ Another preferred way of managing variables is to create a group_vars directory inside your Ansible working directory. 
+ Ansible will load any YAML files in this directory with the name of any Ansible group.
+ Create the directory group_vars in your Ansible working directory, and then create the variable files matching with the group name from the inventory file. 
+ In our example, this would be webservers and dbservers. 
+ This allows you to separate variables according to host groups, which can make everything easier to manage.
+ 
+ $ cd <your_ansible_working_directory>
+$ mkdir group_vars
+$ cd group_vars
+$ vi webservers
+
+---
+pkgname: nginx
+
+$ vi dbservers
+
+---
+pkgname: mysql-server
+
+You don’t need to declare the variable in your playbook, 
+as Ansible will automatically pull the variables from each group_vars files and will substitute them during runtime.
+
+
 
