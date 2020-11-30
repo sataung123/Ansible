@@ -150,4 +150,105 @@ This connection plugin is typically used by network devices for sending and rece
  gather_facts: false
  connection: network_cli
 
+## yum module ##
+Most systems require root/superuser permissions to manage packages, which means that become: true is required.
+recommend always using the update_cache: true parameter when installing or updating packages, 
+which forces yum to check if the package cache is out of date and it update it if needed.
+
+- name: ensure wget is installed
+  yum:
+    name: wget
+    state: present
+    update_cache: true
+  become: true
+  
+Set the name parameter to the package you wish to install and state: present to install a package. 
+
+## install multiple packages with yum module ##
+
+- name: ensure wget and ruby are installed
+  yum:
+    name: 
+      - wget
+      - ruby
+    state: present
+    update_cache: true
+  become: true
+
+## remove package with yum module ##
+Set state: absent to remove a package. 
+I suggest also setting autoremove: true to remove any dependencies that were installed originally, but are no longer required.
+
+- name: ensure wget is not installed
+  yum:
+    name: wget
+    state: absent
+    autoremove: true
+  become: true
+  
+## update package with yum module ##
+Setting state: latest will install the latest version of a package, or update a package that is already installed where a newer version is available. 
+
+- name: ensure latest version of wget is installed
+  yum:
+    name: wget
+    state: latest
+    update_cache: true
+  become: true
+
+## downgrade package with yum module ##
+Set the name to an older package version and allow_downgrade: true to downgrade a package.
+
+- name: downgrade ruby and ruby-libs to a specific version
+  yum:
+    name: 
+      - ruby-2.0.0.648-33.el7_4
+      - ruby-libs-2.0.0.648-33.el7_4
+    state: present
+    allow_downgrade: true
+    update_cache: true
+  become: true
+  
+## list available package with yum module ##
+Set the list parameter to the name of a package to return a list of available (and installed) packages.
+
+- name: list installed and available versions of ruby
+  yum:
+    list: ruby
+  become: true
+  when: ansible_os_family == 'RedHat'
+  register: yum_output
+
+- name: print available ruby versions
+  debug:
+    msg: "{{ item.version }}-{{ item.release }}"
+  loop: "{{ yum_output.results | selectattr('yumstate', 'equalto', 'available') | list }}"
+
+- debug: var=yum_output
+
+The format of the version string is {{ package_name }}-{{ package_version }}-{{ package_release }}.
+
+## install package groups with yum module ##
+yum group list ids
+yum group info $PACKAGE
+
+- name: ensure development tools are installed
+  yum:
+    name: "@development"
+    state: present
+  become: true
+
+## capture yum module output ##
+Use the register keyword to capture the output of the yum module.
+
+- name: ensure wget is installed
+  yum:
+    name: wget
+    state: present
+  become: true
+  register: yum_output
+
+- debug: var=yum_output
+
+
 
