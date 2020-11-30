@@ -447,6 +447,7 @@ Prompting the user for variables lets you avoid recording sensitive data like pa
     - name: username
       prompt: What is your username?
       private: no
+      confirm: yes
 
     - name: password
       prompt: What is your password?
