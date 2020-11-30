@@ -436,4 +436,28 @@ retry_files_save_path = "~/" # The directory they will go into
 ## Roles ##
 Roles let you automatically load related vars_files, tasks, handlers, and other Ansible artifacts based on a known file structure. Once you group your content in roles, you can easily reuse them and share them with other users.
 
+### var_prompt ###
+If you want your playbook to prompt the user for certain input, add a ‘vars_prompt’ section. 
+Prompting the user for variables lets you avoid recording sensitive data like passwords. 
+
+---
+- hosts: all
+  vars_prompt:
+
+    - name: username
+      prompt: What is your username?
+      private: no
+
+    - name: password
+      prompt: What is your password?
+
+  tasks:
+
+    - name: Print a message
+      ansible.builtin.debug:
+        msg: 'Logging in as {{ username }}'
+        
+The user input is hidden by default but it can be made visible by setting private: no.
+
+
 
