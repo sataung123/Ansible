@@ -43,6 +43,18 @@ ansible contrail -b --become-user=heat-admin -m shell -a 'sudo contrail-status' 
 -m: Declares which module is used in the command
 -a: Declares which arguments are passed to the module
 
+(overcloud) [stack@director ~]$ cat get_ip.yml
+---
+- hosts : compute,control,contrail
+  gather_facts : false
+  become_user : root
+  become : true
+  tasks :
+        - name : Get IP addresses from NFVI
+          shell : "ip -o a"
+          register : ip_output
+        - debug : var=ip_output
+
 ## with_items module ##
 Sometimes we want to do many things with single tasks like installing many packages with the same tasks just by changing the arguments.
 By using the with_items, ansible creates a temporary variable called {{item}} which consist the value for the current iteration. 
