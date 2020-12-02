@@ -502,7 +502,26 @@ This is primarily useful when you want to change a single line in a file only.
         regexp: '^#PermitRootLogin'
         line: 'PermitRootLogin no'
         
+        
+## perform the command on each server in sequence ## 
 
+ansible multi -a "hostname" -f 1
+
+will run server in sequence (server-1, 2, 3, ....)
+
+## limit to specific host ##
+
+ansible app -b -a "service ntpd restart" --limit "192.168.60.4"
+
+## group module ad-hoc ##
+
+ansible app -b -m group -a "name=admin state=present"
+
+ansible app -b -m user -a "name=johndoe group=admin createhome=yes"
+
+ansible app -b -m user -a "name=johndoe state=absent remove=yes"
+
+### Ansible default module is command ###
 
 
 
